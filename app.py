@@ -2,7 +2,6 @@ import streamlit as st
 import random
 import time
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # ======================
 # SORTING ALGORITHMS
@@ -40,7 +39,7 @@ def insertion_sort(arr):
     return a
 
 # ======================
-# BENCHMARK FUNCTION
+# BENCHMARK
 # ======================
 
 def benchmark(sort_func, data):
@@ -50,10 +49,10 @@ def benchmark(sort_func, data):
     return end - start
 
 # ======================
-# STREAMLIT UI
+# UI
 # ======================
 
-st.title("📊 Sorting Benchmark")
+st.title("📊 Sorting Benchmark (Tanpa Matplotlib, santai aja)")
 
 sizes = [100, 1000, 10000, 50000]
 algorithms = {
@@ -65,7 +64,7 @@ algorithms = {
 results = []
 
 if st.button("Jalankan Benchmark"):
-    st.write("⏳ Lagi kerja... sabar ya (apalagi Bubble Sort bakal ngos-ngosan)")
+    st.write("⏳ Lagi jalan... jangan berharap Bubble Sort cepat ya.")
 
     for size in sizes:
         data = [random.randint(1, 100000) for _ in range(size)]
@@ -81,62 +80,53 @@ if st.button("Jalankan Benchmark"):
             results.append({
                 "Ukuran Data": size,
                 "Algoritma": name,
-                "Rata-rata Waktu (detik)": avg_time
+                "Waktu": avg_time
             })
 
     df = pd.DataFrame(results)
 
+    # ======================
+    # TABEL
+    # ======================
     st.subheader("📋 Tabel Benchmark")
     st.dataframe(df)
 
     # ======================
-    # VISUALISASI
+    # GRAFIK (Streamlit)
     # ======================
     st.subheader("📈 Grafik Performa")
 
-    fig, ax = plt.subplots()
-
-    for algo in df["Algoritma"].unique():
-        subset = df[df["Algoritma"] == algo]
-        ax.plot(subset["Ukuran Data"], subset["Rata-rata Waktu (detik)"], label=algo)
-
-    ax.set_xlabel("Ukuran Data")
-    ax.set_ylabel("Waktu (detik)")
-    ax.legend()
-
-    st.pyplot(fig)
+    chart_data = df.pivot(index="Ukuran Data", columns="Algoritma", values="Waktu")
+    st.line_chart(chart_data)
 
     # ======================
-    # ANALISIS OTOMATIS
+    # ANALISIS
     # ======================
     st.subheader("🧠 Analisis")
 
-    fastest = df.loc[df["Rata-rata Waktu (detik)"].idxmin()]
+    fastest = df.loc[df["Waktu"].idxmin()]
 
     st.write(f"""
     ### 🔥 Algoritma Tercepat
-    **{fastest['Algoritma']}** adalah yang paling cepat pada data ukuran {fastest['Ukuran Data']}.
-    
+    **{fastest['Algoritma']}** adalah yang paling cepat.
+
     ### 🤔 Kenapa?
-    - Bubble Sort: banyak swap → lambat banget
-    - Selection Sort: tetap O(n²), tapi swap lebih sedikit
-    - Insertion Sort: lebih efisien untuk data kecil
-    
-    Jadi biasanya:
-    👉 Insertion Sort paling cepat di ukuran kecil  
-    👉 Semua tetap lambat di data besar (karena O(n²))
-    
-    ### 📚 Kesesuaian dengan Big O
-    Hasil benchmark **sesuai teori Big O**:
-    
-    - Bubble Sort = O(n²)
-    - Selection Sort = O(n²)
-    - Insertion Sort = O(n²)
-    
-    Terlihat dari grafik:
-    📈 waktu naik drastis saat ukuran data membesar
-    
-    Artinya:
-    ✔ Teori = sesuai praktik  
-    ✔ Tidak ada keajaiban, tetap lambat 😌
+    - Bubble Sort → terlalu banyak swap → paling lambat
+    - Selection Sort → tetap O(n²), tapi lebih stabil
+    - Insertion Sort → efisien di data kecil
+
+    Jadi:
+    👉 Insertion Sort biasanya menang di ukuran kecil  
+    👉 Semua tetap melemah di ukuran besar
+
+    ### 📚 Big O
+    Semua algoritma ini punya kompleksitas:
+    - O(n²)
+
+    Dari grafik:
+    ✔ Waktu meningkat drastis saat data bertambah  
+    ✔ Sesuai teori Big O  
+
+    Kesimpulan:
+    Tidak ada plot twist. Semua tetap lambat 😌
     """)
