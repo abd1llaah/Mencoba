@@ -4,7 +4,7 @@ import time
 import pandas as pd
 
 # ======================
-# SORTING ALGORITHMS
+# SORTING
 # ======================
 
 def bubble_sort(arr):
@@ -52,7 +52,7 @@ def benchmark(sort_func, data):
 # UI
 # ======================
 
-st.title("📊 Sorting Benchmark (Tanpa Matplotlib, santai aja)")
+st.title("📊 Sorting Benchmark (Animasi dikit biar keliatan niat)")
 
 sizes = [100, 1000, 10000, 50000]
 algorithms = {
@@ -61,12 +61,16 @@ algorithms = {
     "Insertion Sort": insertion_sort
 }
 
-results = []
-
 if st.button("Jalankan Benchmark"):
-    st.write("⏳ Lagi jalan... jangan berharap Bubble Sort cepat ya.")
+
+    chart_placeholder = st.empty()
+    table_placeholder = st.empty()
+
+    results = []
 
     for size in sizes:
+        st.write(f"🔄 Proses ukuran data: {size}")
+
         data = [random.randint(1, 100000) for _ in range(size)]
 
         for name, func in algorithms.items():
@@ -83,21 +87,17 @@ if st.button("Jalankan Benchmark"):
                 "Waktu": avg_time
             })
 
-    df = pd.DataFrame(results)
+        df = pd.DataFrame(results)
 
-    # ======================
-    # TABEL
-    # ======================
-    st.subheader("📋 Tabel Benchmark")
-    st.dataframe(df)
+        # update tabel
+        table_placeholder.dataframe(df)
 
-    # ======================
-    # GRAFIK (Streamlit)
-    # ======================
-    st.subheader("📈 Grafik Performa")
+        # update grafik
+        chart_data = df.pivot(index="Ukuran Data", columns="Algoritma", values="Waktu")
+        chart_placeholder.line_chart(chart_data)
 
-    chart_data = df.pivot(index="Ukuran Data", columns="Algoritma", values="Waktu")
-    st.line_chart(chart_data)
+        # delay biar keliatan animasi
+        time.sleep(1)
 
     # ======================
     # ANALISIS
@@ -108,25 +108,21 @@ if st.button("Jalankan Benchmark"):
 
     st.write(f"""
     ### 🔥 Algoritma Tercepat
-    **{fastest['Algoritma']}** adalah yang paling cepat.
+    **{fastest['Algoritma']}** paling cepat.
 
     ### 🤔 Kenapa?
-    - Bubble Sort → terlalu banyak swap → paling lambat
-    - Selection Sort → tetap O(n²), tapi lebih stabil
-    - Insertion Sort → efisien di data kecil
-
-    Jadi:
-    👉 Insertion Sort biasanya menang di ukuran kecil  
-    👉 Semua tetap melemah di ukuran besar
+    - Bubble Sort = terlalu banyak swap → lambat
+    - Selection Sort = tetap O(n²)
+    - Insertion Sort = lebih efisien untuk data kecil
 
     ### 📚 Big O
-    Semua algoritma ini punya kompleksitas:
+    Semua:
     - O(n²)
 
-    Dari grafik:
-    ✔ Waktu meningkat drastis saat data bertambah  
-    ✔ Sesuai teori Big O  
+    Grafik tadi nunjukin:
+    ✔ makin besar data → makin lama  
+    ✔ sesuai teori  
 
     Kesimpulan:
-    Tidak ada plot twist. Semua tetap lambat 😌
+    Gak ada keajaiban. Tetap lambat semua 😌
     """)
