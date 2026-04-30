@@ -2,13 +2,12 @@ import streamlit as st
 import random
 import time
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # ======================
-# UI AWAL (HARUS MUNCUL DULU)
+# UI
 # ======================
 st.title("📊 Sorting Benchmark")
-st.write("Bandingkan Bubble, Selection, dan Insertion Sort")
+st.write("Perbandingan Bubble, Selection, dan Insertion Sort")
 
 # ======================
 # SORTING
@@ -58,32 +57,29 @@ def benchmark(sort_func, data):
     return sum(times) / 3
 
 # ======================
-# SIMPAN HASIL
+# SESSION STATE
 # ======================
 if "results" not in st.session_state:
     st.session_state.results = []
 
 # ======================
-# PILIH DATA
+# DATA SIZE (AMAN)
 # ======================
-sizes = [100, 1000, 10000, 50000]
+sizes = [100, 1000, 5000, 10000]
 
 st.subheader("⚙️ Jalankan per ukuran data")
 
 for size in sizes:
     if st.button(f"Run n = {size}"):
 
-        with st.spinner(f"Processing n={size}... jangan panik 😭"):
+        with st.spinner(f"Processing n={size}... sabar ya 😭"):
 
-            # generate data DI DALAM tombol (ini penting!)
             data = [random.randint(1, 100000) for _ in range(size)]
 
-            # benchmark
             bubble = benchmark(bubble_sort, data)
             selection = benchmark(selection_sort, data)
             insertion = benchmark(insertion_sort, data)
 
-            # simpan
             st.session_state.results.append({
                 "Ukuran": size,
                 "Bubble": bubble,
@@ -103,20 +99,11 @@ if st.session_state.results:
     st.dataframe(df)
 
     # ======================
-    # GRAFIK
+    # GRAFIK STREAMLIT (NO MATPLOTLIB)
     # ======================
-    st.subheader("📈 Grafik")
-
-    fig, ax = plt.subplots()
-    ax.plot(df["Ukuran"], df["Bubble"], label="Bubble")
-    ax.plot(df["Ukuran"], df["Selection"], label="Selection")
-    ax.plot(df["Ukuran"], df["Insertion"], label="Insertion")
-
-    ax.set_xlabel("Ukuran Data")
-    ax.set_ylabel("Waktu (detik)")
-    ax.legend()
-
-    st.pyplot(fig)
+    st.subheader("📈 Grafik Performa")
+    chart_df = df.set_index("Ukuran")
+    st.line_chart(chart_df)
 
     # ======================
     # ANALISIS
@@ -130,9 +117,9 @@ if st.session_state.results:
 
     st.write("""
 📌 **Mengapa?**  
-Insertion Sort lebih efisien dalam pergeseran data dibanding Bubble dan Selection, sehingga sering lebih cepat pada data kecil-menengah.
+Insertion Sort cenderung lebih cepat karena lebih efisien dalam pergeseran elemen dibanding Bubble dan Selection.
 
 📌 **Apakah sesuai Big O?**  
 Ya. Ketiga algoritma memiliki kompleksitas O(n²).  
-Namun dalam praktik, waktu eksekusi bisa berbeda karena jumlah operasi nyata tiap algoritma tidak sama.
+Namun dalam praktik, performa bisa berbeda karena jumlah operasi nyata tidak sama.
 """)
