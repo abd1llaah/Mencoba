@@ -113,13 +113,13 @@ if st.session_state.results:
     avg = df[["Bubble", "Selection", "Insertion"]].mean()
     fastest = avg.idxmin()
 
-    st.write(f"🏆 Algoritma tercepat: **{fastest}**")
+    st.write(f" Algoritma tercepat: **{fastest}**")
 
     st.write("""
-📌 **Mengapa?**  
+ **Mengapa?**  
 Insertion Sort cenderung lebih cepat karena lebih efisien dalam pergeseran elemen dibanding Bubble dan Selection.
 
-📌 **Apakah sesuai Big O?**  
+ **Apakah sesuai Big O?**  
 Ya. Ketiga algoritma memiliki kompleksitas O(n²).  
 Namun dalam praktik, performa bisa berbeda karena jumlah operasi nyata tidak sama.
 """)
