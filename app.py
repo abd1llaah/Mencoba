@@ -1,125 +1,63 @@
 import streamlit as st
-import random
-import time
-import pandas as pd
+
+st.title("Visualisasi Algoritma Searching")
+
+# Input data
+data_input = st.text_input("Masukkan angka (pisahkan dengan koma)", "1,3,5,7,9,11")
+target = st.number_input("Angka yang dicari", step=1)
+
+data = [int(x) for x in data_input.split(",")]
+
+# PILIH ALGORITMA
+algo = st.selectbox("Pilih Algoritma", ["Linear Search", "Binary Search"])
 
 # ======================
-# UI
+# LINEAR SEARCH
 # ======================
-st.title("📊 Sorting Benchmark")
-st.write("Perbandingan Bubble, Selection, dan Insertion Sort")
-
-# ======================
-# SORTING
-# ======================
-def bubble_sort(arr):
-    a = arr.copy()
-    n = len(a)
-    for i in range(n):
-        for j in range(n-i-1):
-            if a[j] > a[j+1]:
-                a[j], a[j+1] = a[j+1], a[j]
-    return a
-
-def selection_sort(arr):
-    a = arr.copy()
-    n = len(a)
-    for i in range(n):
-        min_idx = i
-        for j in range(i+1, n):
-            if a[j] < a[min_idx]:
-                min_idx = j
-        a[i], a[min_idx] = a[min_idx], a[i]
-    return a
-
-def insertion_sort(arr):
-    a = arr.copy()
-    for i in range(1, len(a)):
-        key = a[i]
-        j = i - 1
-        while j >= 0 and a[j] > key:
-            a[j+1] = a[j]
-            j -= 1
-        a[j+1] = key
-    return a
+def linear_search(arr, target):
+    steps = []
+    for i in range(len(arr)):
+        steps.append(f"Cek index {i}: {arr[i]}")
+        if arr[i] == target:
+            return i, steps
+    return -1, steps
 
 # ======================
-# BENCHMARK
+# BINARY SEARCH
 # ======================
-def benchmark(sort_func, data):
-    times = []
-    for _ in range(3):
-        arr = data.copy()
-        start = time.time()
-        sort_func(arr)
-        end = time.time()
-        times.append(end - start)
-    return sum(times) / 3
+def binary_search(arr, target):
+    arr.sort()
+    low = 0
+    high = len(arr) - 1
+    steps = []
 
-# ======================
-# SESSION STATE
-# ======================
-if "results" not in st.session_state:
-    st.session_state.results = []
+    while low <= high:
+        mid = (low + high) // 2
+        steps.append(f"Low={low}, High={high}, Mid={mid} -> {arr[mid]}")
 
-# ======================
-# DATA SIZE (AMAN)
-# ======================
-sizes = [100, 1000, 5000, 10000]
+        if arr[mid] == target:
+            return mid, steps
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
 
-st.subheader("Jalankan per ukuran data")
-
-for size in sizes:
-    if st.button(f"Run n = {size}"):
-
-        with st.spinner(f"Processing n={size}... sabar ya 😭"):
-
-            data = [random.randint(1, 100000) for _ in range(size)]
-
-            bubble = benchmark(bubble_sort, data)
-            selection = benchmark(selection_sort, data)
-            insertion = benchmark(insertion_sort, data)
-
-            st.session_state.results.append({
-                "Ukuran": size,
-                "Bubble": bubble,
-                "Selection": selection,
-                "Insertion": insertion
-            })
-
-            st.success(f"Selesai n={size}")
+    return -1, steps
 
 # ======================
-# TAMPILKAN HASIL
+# EKSEKUSI
 # ======================
-if st.session_state.results:
-    df = pd.DataFrame(st.session_state.results)
+if st.button("Cari"):
+    if algo == "Linear Search":
+        index, steps = linear_search(data, target)
+    else:
+        index, steps = binary_search(data, target)
 
-    st.subheader("Tabel Benchmark")
-    st.dataframe(df)
+    st.subheader("Langkah-langkah:")
+    for step in steps:
+        st.write(step)
 
-    # ======================
-    # GRAFIK STREAMLIT (NO MATPLOTLIB)
-    # ======================
-    st.subheader("Grafik Performa")
-    chart_df = df.set_index("Ukuran")
-    st.line_chart(chart_df)
-
-    # ======================
-    # ANALISIS
-    # ======================
-    st.subheader("Analisis")
-
-    avg = df[["Bubble", "Selection", "Insertion"]].mean()
-    fastest = avg.idxmin()
-
-    st.write(f" Algoritma tercepat: **{fastest}**")
-
-    st.write("""
- **Mengapa?**  
-Insertion Sort cenderung lebih cepat karena lebih efisien dalam pergeseran elemen dibanding Bubble dan Selection.
-
- **Apakah sesuai Big O?**  
-Ya. Ketiga algoritma memiliki kompleksitas O(n²).  
-Namun dalam praktik, performa bisa berbeda karena jumlah operasi nyata tidak sama.
-""")
+    if index != -1:
+        st.success(f"Ditemukan di index {index}")
+    else:
+        st.error("Tidak ditemukan")
