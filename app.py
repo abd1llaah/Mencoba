@@ -1,63 +1,39 @@
-import streamlit as st
+class HashTable:
+    def __init__(self, size=10):
+        self.size = size
+        self.table = [[] for _ in range(size)]
 
-st.title("Visualisasi Algoritma Searching")
+    def hash_function(self, key):
+        return hash(key) % self.size
 
-# Input data
-data_input = st.text_input("Masukkan angka (pisahkan dengan koma)", "1,2,4,5,7,9")
-target = st.number_input("Angka yang dicari", step=1)
+    def insert(self, key, value):
+        index = self.hash_function(key)
+        self.table[index].append((key, value))
 
-data = [int(x) for x in data_input.split(",")]
+    def search(self, key):
+        index = self.hash_function(key)
+        for k, v in self.table[index]:
+            if k == key:
+                return v
+        return None
 
-# PILIH ALGORITMA
-algo = st.selectbox("Pilih Algoritma", ["Linear Search", "Binary Search"])
+    def display(self):
+        for i, bucket in enumerate(self.table):
+            print(f"Index {i}: {bucket}")
 
-# ======================
-# LINEAR SEARCH
-# ======================
-def linear_search(arr, target):
-    steps = []
-    for i in range(len(arr)):
-        steps.append(f"Cek index {i}: {arr[i]}")
-        if arr[i] == target:
-            return i, steps
-    return -1, steps
-
-# ======================
-# BINARY SEARCH
-# ======================
-def binary_search(arr, target):
-    arr.sort()
-    low = 0
-    high = len(arr) - 1
-    steps = []
-
-    while low <= high:
-        mid = (low + high) // 2
-        steps.append(f"Low={low}, High={high}, Mid={mid} -> {arr[mid]}")
-
-        if arr[mid] == target:
-            return mid, steps
-        elif arr[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-
-    return -1, steps
 
 # ======================
-# EKSEKUSI
+# TEST
 # ======================
-if st.button("Cari"):
-    if algo == "Linear Search":
-        index, steps = linear_search(data, target)
-    else:
-        index, steps = binary_search(data, target)
+ht = HashTable()
 
-    st.subheader("Langkah-langkah:")
-    for step in steps:
-        st.write(step)
+ht.insert("nama", "Budi")
+ht.insert("umur", 20)
+ht.insert("kota", "Bandung")
 
-    if index != -1:
-        st.success(f"Ditemukan di index {index}")
-    else:
-        st.error("Tidak ditemukan")
+print("Hasil Search:")
+print("nama:", ht.search("nama"))
+print("umur:", ht.search("umur"))
+
+print("\nIsi Hash Table:")
+ht.display()
