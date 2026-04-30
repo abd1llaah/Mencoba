@@ -67,7 +67,7 @@ if "results" not in st.session_state:
 # ======================
 sizes = [100, 1000, 5000, 10000]
 
-st.subheader("⚙️ Jalankan per ukuran data")
+st.subheader("Jalankan per ukuran data")
 
 for size in sizes:
     if st.button(f"Run n = {size}"):
@@ -95,20 +95,20 @@ for size in sizes:
 if st.session_state.results:
     df = pd.DataFrame(st.session_state.results)
 
-    st.subheader("📋 Tabel Benchmark")
+    st.subheader("Tabel Benchmark")
     st.dataframe(df)
 
     # ======================
     # GRAFIK STREAMLIT (NO MATPLOTLIB)
     # ======================
-    st.subheader("📈 Grafik Performa")
+    st.subheader("Grafik Performa")
     chart_df = df.set_index("Ukuran")
     st.line_chart(chart_df)
 
     # ======================
     # ANALISIS
     # ======================
-    st.subheader("🧠 Analisis")
+    st.subheader("Analisis")
 
     avg = df[["Bubble", "Selection", "Insertion"]].mean()
     fastest = avg.idxmin()
