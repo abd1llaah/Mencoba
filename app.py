@@ -3,7 +3,7 @@ import streamlit as st
 st.title("Visualisasi Algoritma Searching")
 
 # Input data
-data_input = st.text_input("Masukkan angka (pisahkan dengan koma)", "1,2,7,8,9,5,4")
+data_input = st.text_input("Masukkan angka (pisahkan dengan koma)", "1,2,4,5,7,9")
 target = st.number_input("Angka yang dicari", step=1)
 
 data = [int(x) for x in data_input.split(",")]
