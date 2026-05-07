@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 # =========================
 # NODE
@@ -33,19 +34,20 @@ class BST:
 # =========================
 # POSISI NODE
 # =========================
-def get_positions(root, x=0, y=0, pos=None, level_gap=2):
+def get_positions(root, x=0, y=0, pos=None, parent=None):
 
     if pos is None:
         pos = []
 
     if root:
-        pos.append((root.value, x, y))
+
+        pos.append((root.value, x, y, parent))
 
         if root.left:
-            get_positions(root.left, x - level_gap, y - 1, pos, level_gap / 2)
+            get_positions(root.left, x - 1, y + 1, pos, root.value)
 
         if root.right:
-            get_positions(root.right, x + level_gap, y - 1, pos, level_gap / 2)
+            get_positions(root.right, x + 1, y + 1, pos, root.value)
 
     return pos
 
@@ -58,16 +60,65 @@ def draw_tree(root):
     positions = get_positions(root)
 
     html = """
-    <div style='position:relative; width:100%; height:500px;'>
+    <div style="
+        position:relative;
+        width:100%;
+        height:500px;
+        background:white;
+    ">
     """
 
     center_x = 400
     center_y = 50
 
-    for value, x, y in positions:
+    coords = {}
 
-        left = center_x + (x * 120)
-        top = center_y + (-y * 100)
+    # =========================
+    # SIMPAN POSISI NODE
+    # =========================
+    for value, x, y, parent in positions:
+
+        left = center_x + (x * 150)
+        top = center_y + (y * 120)
+
+        coords[value] = (left, top)
+
+    # =========================
+    # GARIS PENGHUBUNG
+    # =========================
+    for value, x, y, parent in positions:
+
+        if parent is not None:
+
+            x1, y1 = coords[parent]
+            x2, y2 = coords[value]
+
+            html += f"""
+            <svg style="
+                position:absolute;
+                left:0;
+                top:0;
+                width:100%;
+                height:100%;
+                overflow:visible;
+            ">
+                <line
+                    x1="{x1+30}"
+                    y1="{y1+30}"
+                    x2="{x2+30}"
+                    y2="{y2+30}"
+                    stroke="black"
+                    stroke-width="3"
+                />
+            </svg>
+            """
+
+    # =========================
+    # NODE
+    # =========================
+    for value, x, y, parent in positions:
+
+        left, top = coords[value]
 
         html += f"""
         <div style="
@@ -90,7 +141,10 @@ def draw_tree(root):
 
     html += "</div>"
 
-    st.markdown(html, unsafe_allow_html=True)
+    # =========================
+    # TAMPILKAN HTML
+    # =========================
+    components.html(html, height=500)
 
 
 # =========================
