@@ -1,6 +1,3 @@
-import streamlit as st
-import matplotlib.pyplot as plt
-
 class Node:
     def __init__(self, value):
         self.value = value
@@ -20,150 +17,131 @@ class BST:
             root.right = self.insert(root.right, value)
         return root
 
-    def preorder(self, root, res=[]):
+    def preorder(self, root, result=None):
+        if result is None:
+            result = []
         if root:
-            res.append(root.value)
-            self.preorder(root.left, res)
-            self.preorder(root.right, res)
-        return res
+            result.append(root.value)
+            self.preorder(root.left, result)
+            self.preorder(root.right, result)
+        return result
 
-    def inorder(self, root, res=[]):
+    def inorder(self, root, result=None):
+        if result is None:
+            result = []
         if root:
-            self.inorder(root.left, res)
-            res.append(root.value)
-            self.inorder(root.right, res)
-        return res
+            self.inorder(root.left, result)
+            result.append(root.value)
+            self.inorder(root.right, result)
+        return result
 
-    def postorder(self, root, res=[]):
+    def postorder(self, root, result=None):
+        if result is None:
+            result = []
         if root:
-            self.postorder(root.left, res)
-            self.postorder(root.right, res)
-            res.append(root.value)
-        return res
+            self.postorder(root.left, result)
+            self.postorder(root.right, result)
+            result.append(root.value)
+        return result
 
-def get_positions(node, depth=0, left=0.0, right=1.0, pos={}):
-    if node is None:
-        return pos
-    mid = (left + right) / 2
-    pos[node.value] = (mid, -depth)
-    get_positions(node.left,  depth+1, left, mid, pos)
-    get_positions(node.right, depth+1, mid, right, pos)
-    return pos
 
-def get_edges(node, edges=[]):
-    if node is None:
-        return edges
-    if node.left:
-        edges.append((node.value, node.left.value))
-        get_edges(node.left, edges)
-    if node.right:
-        edges.append((node.value, node.right.value))
-        get_edges(node.right, edges)
-    return edges
+print("=" * 55)
+print("       BINARY SEARCH TREE - TRAVERSAL")
+print("=" * 55)
 
-def draw_tree(root, new_nodes=set()):
-    pos   = get_positions(root, pos={})
-    edges = get_edges(root, edges=[])
-
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.axis("off")
-
-    for p, c in edges:
-        px, py = pos[p]
-        cx, cy = pos[c]
-        ax.plot([px, cx], [py, cy], 'k-', lw=1.5)
-
-    for val, (x, y) in pos.items():
-        color = "#a78bfa" if val in new_nodes else "#60a5fa"
-        circle = plt.Circle((x, y), 0.04, color=color, zorder=2)
-        ax.add_patch(circle)
-        ax.text(x, y, str(val), ha='center', va='center',
-                fontsize=10, fontweight='bold', color='white', zorder=3)
-
-    xs = [v[0] for v in pos.values()]
-    ys = [v[1] for v in pos.values()]
-    ax.set_xlim(min(xs)-0.08, max(xs)+0.08)
-    ax.set_ylim(min(ys)-0.1,  max(ys)+0.1)
-    plt.tight_layout()
-    return fig
-
-# ── App ──────────────────────────────────────
-st.title("🌳 BST Visualizer")
-
-# Build tree
 tree = BST()
-for v in [50, 30, 70, 20, 40, 60, 80]:
-    tree.root = tree.insert(tree.root, v)
+data_awal = [50, 30, 70, 20, 40, 60, 80]
 
-# Tambah node baru
-add_new = st.checkbox("Tambahkan node baru: 10, 90, 65")
-new_nodes = set()
-if add_new:
-    for v in [10, 90, 65]:
-        tree.root = tree.insert(tree.root, v)
-        new_nodes.add(v)
+for item in data_awal:
+    tree.root = tree.insert(tree.root, item)
 
-# Gambar tree
-st.subheader("Struktur Tree")
-st.caption("🔵 Node awal   🟣 Node baru")
-st.pyplot(draw_tree(tree.root, new_nodes))
+print(f"\nData awal : {data_awal}")
+print("-" * 55)
+print("TRAVERSAL AWAL (sebelum penambahan node baru):")
+print(f"  Preorder  : {tree.preorder(tree.root)}")
+print(f"  Inorder   : {tree.inorder(tree.root)}")
+print(f"  Postorder : {tree.postorder(tree.root)}")
 
-# Traversal
-st.subheader("Hasil Traversal")
-col1, col2, col3 = st.columns(3)
-col1.markdown("**Preorder**")
-col1.write(tree.preorder(tree.root, []))
-col2.markdown("**Inorder**")
-col2.write(tree.inorder(tree.root, []))
-col3.markdown("**Postorder**")
-col3.write(tree.postorder(tree.root, []))
+# TUGAS 2: Tambahkan node baru: 10, 90, 65
+print("\n" + "=" * 55)
+print("MENAMBAHKAN NODE BARU: 10, 90, 65")
+print("=" * 55)
 
-# Analisis Kesimpulan
-st.subheader("Analisis Perubahan Traversal")
+node_baru = [10, 90, 65]
+for item in node_baru:
+    tree.root = tree.insert(tree.root, item)
+    print(f"  [+] Node {item} berhasil ditambahkan")
 
-st.markdown("**1. Preorder** (Root → Kiri → Kanan)")
-st.table({
-    "": ["Sebelum", "Sesudah"],
-    "Hasil": [
-        "50 → 30 → 20 → 40 → 70 → 60 → 80",
-        "50 → 30 → 20 → 10 → 40 → 70 → 60 → 65 → 80 → 90"
-    ]
-})
-st.markdown("""
-- Node **10** muncul setelah 20 → anak kiri dari 20
-- Node **65** muncul setelah 60 → anak kanan dari 60
-- Node **90** muncul setelah 80 → anak kanan dari 80
+# TUGAS 3: Tampilkan traversal setelah penambahan
+print("\n" + "-" * 55)
+print("TRAVERSAL SETELAH PENAMBAHAN NODE BARU:")
+pre  = tree.preorder(tree.root)
+ino  = tree.inorder(tree.root)
+post = tree.postorder(tree.root)
+print(f"  Preorder  : {pre}")
+print(f"  Inorder   : {ino}")
+print(f"  Postorder : {post}")
+
+
+
+# TUGAS 4: Analisis perubahan hasil traversal
+print("\n" + "=" * 55)
+print("ANALISIS PERUBAHAN TRAVERSAL")
+print("=" * 55)
+print("""
+  1. PREORDER (Root → Kiri → Kanan):
+     Sebelum: [50, 30, 20, 40, 70, 60, 80]
+     Sesudah: [50, 30, 20, 10, 40, 70, 60, 65, 80, 90]
+     -> Node 10 muncul setelah 20 (anak kiri 20)
+     -> Node 65 muncul setelah 60 (anak kanan 60)
+     -> Node 90 muncul setelah 80 (anak kanan 80)
+
+  2. INORDER (Kiri → Root → Kanan):
+     Sebelum: [20, 30, 40, 50, 60, 70, 80]
+     Sesudah: [10, 20, 30, 40, 50, 60, 65, 70, 80, 90]
+     -> Selalu terurut NAIK (sifat utama BST)
+     -> Node baru otomatis masuk di posisi yang benar
+
+  3. POSTORDER (Kiri → Kanan → Root):
+     Sebelum: [20, 40, 30, 60, 80, 70, 50]
+     Sesudah: [10, 20, 40, 30, 65, 60, 90, 80, 70, 50]
+     -> Root (50) selalu muncul paling akhir
+     -> Setiap subtree diproses tuntas sebelum parent-nya
+
+  ANALISIS KESIMPULAN:
+     - Inorder selalu menghasilkan urutan terurut pada BST, dia ini tidak berubah, cuma bertambah 3 elemen baru di posisi yang benar
+     - Preorder dan Postorder berubah karena path traversal melewati cabang baru (10 di bawah 20, 65 di bawah 60, 90 di bawah 80)
+     - Penambahan node itu engga ngubah posisi node yang lama, tapi cuma nambahin cabang di leaf aja
 """)
 
-st.markdown("**2. Inorder** (Kiri → Root → Kanan)")
-st.table({
-    "": ["Sebelum", "Sesudah"],
-    "Hasil": [
-        "20 → 30 → 40 → 50 → 60 → 70 → 80",
-        "10 → 20 → 30 → 40 → 50 → 60 → 65 → 70 → 80 → 90"
-    ]
-})
-st.markdown("""
-- Selalu terurut **naik** — sifat utama BST
-- Node baru otomatis masuk di posisi yang benar
-""")
 
-st.markdown("**3. Postorder** (Kiri → Kanan → Root)")
-st.table({
-    "": ["Sebelum", "Sesudah"],
-    "Hasil": [
-        "20 → 40 → 30 → 60 → 80 → 70 → 50",
-        "10 → 20 → 40 → 30 → 65 → 60 → 90 → 80 → 70 → 50"
-    ]
-})
-st.markdown("""
-- Root **(50)** selalu muncul **paling akhir**
-- Setiap subtree diproses tuntas sebelum parent-nya
-""")
 
-st.success("""
-**Kesimpulan:**
-- Inorder selalu menghasilkan urutan terurut pada BST, dia tidak berubah, hanya bertambah 3 elemen baru di posisi yang benar
-- Preorder dan Postorder berubah karena path traversal melewati cabang baru (10 di bawah 20, 65 di bawah 60, 90 di bawah 80)
-- Penambahan node tidak mengubah posisi node yang lama, tapi hanya menambahkan cabang di leaf saja
+# TUGAS 5: Visualisasi tree (text-based)
+print("=" * 55)
+print("VISUALISASI TREE (setelah semua node ditambahkan)")
+print("=" * 55)
+
+def visualize_tree(root, prefix="", is_left=True):
+    if root is None:
+        return
+    if root.right:
+        visualize_tree(root.right, prefix + ("│   " if is_left else "    "), False)
+    print(prefix + ("└── " if is_left else "┌── ") + str(root.value))
+    if root.left:
+        visualize_tree(root.left, prefix + ("    " if is_left else "│   "), True)
+
+print()
+visualize_tree(tree.root)
+
+print("\nStruktur posisi node:")
+print("""
+                  50          ← Root
+                /    \\
+              30      70
+             /  \\    /  \\
+           20   40  60   80
+           /       \\      \\
+          10        65     90
 """)
+print("Node baru: 10, 65, 90 (ditandai miring)")
+print("=" * 55)
