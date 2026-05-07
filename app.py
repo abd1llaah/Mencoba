@@ -1,8 +1,7 @@
 import streamlit as st
-from graphviz import Digraph
 
 # =========================
-# Node Class
+# NODE CLASS
 # =========================
 class Node:
     def __init__(self, value):
@@ -11,7 +10,7 @@ class Node:
         self.right = None
 
 # =========================
-# BST Class
+# BST CLASS
 # =========================
 class BST:
     def __init__(self):
@@ -50,41 +49,36 @@ class BST:
             result.append(root.value)
 
 # =========================
-# Fungsi Visualisasi Tree
+# VISUALISASI TREE TANPA GRAPHVIZ
 # =========================
-def draw_tree(node, graph=None):
-    if graph is None:
-        graph = Digraph()
-        graph.attr("node", shape="circle")
+def tampil_tree(node, level=0, posisi="Root"):
+    if node is not None:
 
-    if node:
-        graph.node(str(node.value))
+        spasi = "&nbsp;" * 8 * level
 
-        if node.left:
-            graph.edge(str(node.value), str(node.left.value))
-            draw_tree(node.left, graph)
+        st.markdown(
+            f"{spasi}📍 **{posisi}: {node.value}**",
+            unsafe_allow_html=True
+        )
 
-        if node.right:
-            graph.edge(str(node.value), str(node.right.value))
-            draw_tree(node.right, graph)
-
-    return graph
+        tampil_tree(node.left, level + 1, "L")
+        tampil_tree(node.right, level + 1, "R")
 
 # =========================
 # STREAMLIT APP
 # =========================
-st.title("Visualisasi Binary Search Tree (BST)")
+st.title("Binary Search Tree (BST)")
 
 # Data awal
 data_awal = [50, 30, 70, 20, 40, 60, 80]
 
-# Input tambahan
+# Input node tambahan
 input_user = st.text_input(
-    "Masukkan node tambahan (pisahkan dengan koma)",
+    "Masukkan node tambahan (pisahkan koma)",
     "10,90,65"
 )
 
-# Proses input
+# Konversi input
 tambahan = []
 
 if input_user:
@@ -99,7 +93,9 @@ for item in data_awal:
 for item in tambahan:
     tree.root = tree.insert(tree.root, item)
 
-# Traversal
+# =========================
+# TRAVERSAL
+# =========================
 pre = []
 ino = []
 post = []
@@ -108,21 +104,23 @@ tree.preorder(tree.root, pre)
 tree.inorder(tree.root, ino)
 tree.postorder(tree.root, post)
 
-# Tampilkan hasil traversal
-st.subheader("Hasil Traversal")
+# =========================
+# TAMPILKAN HASIL
+# =========================
+st.subheader("Traversal")
 
-st.write("Preorder:")
+st.write("Preorder")
 st.code(" ".join(map(str, pre)))
 
-st.write("Inorder:")
+st.write("Inorder")
 st.code(" ".join(map(str, ino)))
 
-st.write("Postorder:")
+st.write("Postorder")
 st.code(" ".join(map(str, post)))
 
-# Visualisasi BST
+# =========================
+# VISUALISASI TREE
+# =========================
 st.subheader("Visualisasi Tree")
 
-graph = draw_tree(tree.root)
-
-st.graphviz_chart(graph)
+tampil_tree(tree.root)
