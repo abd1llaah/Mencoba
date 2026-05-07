@@ -73,7 +73,8 @@ class BST:
 # =========================
 # POSISI NODE
 # =========================
-def get_positions(root, x=0, y=0, pos=None, parent=None):
+
+def get_positions(root, x=0, y=0, pos=None, parent=None, gap=4):
 
     if pos is None:
         pos = []
@@ -83,13 +84,26 @@ def get_positions(root, x=0, y=0, pos=None, parent=None):
         pos.append((root.value, x, y, parent))
 
         if root.left:
-            get_positions(root.left, x - 1, y + 1, pos, root.value)
+            get_positions(
+                root.left,
+                x - gap,
+                y + 1,
+                pos,
+                root.value,
+                gap / 2
+            )
 
         if root.right:
-            get_positions(root.right, x + 1, y + 1, pos, root.value)
+            get_positions(
+                root.right,
+                x + gap,
+                y + 1,
+                pos,
+                root.value,
+                gap / 2
+            )
 
     return pos
-
 
 # =========================
 # VISUALISASI TREE
@@ -118,7 +132,7 @@ def draw_tree(root):
     for value, x, y, parent in positions:
 
         left = center_x + (x * 150)
-        top = center_y + (y * 120)
+        top = center_y + (y * 100)
 
         coords[value] = (left, top)
 
